@@ -1,18 +1,35 @@
 # go-mirakurun
 
+go-mirakurun is a [Mirakurun](https://github.com/Chinachu/Mirakurun) Client for Go.
+
 ## Usage
 
 ```go
-import "github.com/ykzts/go-mirakurun/mirakurun"
-```
+package main
 
-```go
-client := mirakurun.NewClient()
-client.Host = "localhost"
-client.Port = 40772
+import (
+	"context"
+	"fmt"
+	"log"
 
-version, err := client.CheckVersion()
-fmt.Println(version.Current)
+	"github.com/ykzts/go-mirakurun/mirakurun"
+)
+
+func main() {
+	client := mirakurun.NewClient()
+	ctx := context.Background()
+
+	channels, _, err := client.Channels.List(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, channel := range channels {
+		for _, service := range channel.Services {
+			fmt.Printf("%d: %s\n", service.ID, service.Name)
+		}
+	}
+}
 ```
 
 ## License
