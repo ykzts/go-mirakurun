@@ -33,11 +33,11 @@ func (s *VersionService) Get(ctx context.Context) (*Version, *http.Response, err
 
 // VersionUpdateOptions ...
 type VersionUpdateOptions struct {
-	Force bool `url:"force,ommitempty"`
+	Force bool `url:"force,omitempty"`
 }
 
 // Update ...
-func (s *VersionService) Update(ctx context.Context, w io.Writer, opt *VersionUpdateOptions) (*http.Response, error) {
+func (s *VersionService) Update(ctx context.Context, opt *VersionUpdateOptions, w io.Writer) (*http.Response, error) {
 	u, err := addOptions("version/update", opt)
 	if err != nil {
 		return nil, err

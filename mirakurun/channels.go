@@ -40,8 +40,8 @@ func (s *ChannelsService) Get(ctx context.Context, typ string, channelID string)
 // ChannelsListOptions specifies optinal parameters to the ChannelsService.List method.
 type ChannelsListOptions struct {
 	Type    string `url:"type,omitempty"`
-	Channel string `url:"channel,ommitempty"`
-	Name    string `url:"name,ommitempty"`
+	Channel string `url:"channel,omitempty"`
+	Name    string `url:"name,omitempty"`
 }
 
 // List ...

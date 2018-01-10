@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	defaultBaseURL   = "http://localhost:40772/api/"
+	defaultBaseURL   = "http://127.0.0.1:40772/api/"
 	defaultUserAgent = "go-mirakurun/1"
 )
 
@@ -31,6 +31,7 @@ type Client struct {
 
 	Channels *ChannelsService
 	Services *ServicesService
+	Programs *ProgramsService
 	Tuners   *TunersService
 	Events   *EventsService
 	Config   *ConfigService
@@ -42,6 +43,11 @@ type Client struct {
 
 type service struct {
 	client *Client
+}
+
+// DecodeOptions ...
+type DecodeOptions struct {
+	Decode int `url:"decode,omitempty"`
 }
 
 func addOptions(s string, opt interface{}) (string, error) {
@@ -70,6 +76,7 @@ func NewClient() *Client {
 	c.common.client = c
 	c.Channels = (*ChannelsService)(&c.common)
 	c.Services = (*ServicesService)(&c.common)
+	c.Programs = (*ProgramsService)(&c.common)
 	c.Tuners = (*TunersService)(&c.common)
 	c.Events = (*EventsService)(&c.common)
 	c.Config = (*ConfigService)(&c.common)
@@ -108,8 +115,10 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
-	if c.UserAgent != "" {
-		req.Header.Set("User-Agent", c.UserAgent)
+	if c.UserAgent == "" {
+		req.Header.Set("User-Agent", defaultUserAgent)
+	} else {
+		req.Header.Set("User-Agent", fmt.Sprintf("%s %s", c.UserAgent, defaultBaseURL))
 	}
 
 	req.Header.Set("X-Mirakurun-Priority", strconv.Itoa(c.Priority))
