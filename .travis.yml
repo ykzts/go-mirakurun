@@ -1,5 +1,9 @@
-sudo: false
 language: go
+sudo: false
+branches:
+  only:
+    - master
+
 go:
   - 1.8
   - 1.9
