@@ -10,10 +10,7 @@ import (
 	"net/http"
 )
 
-// TunersService ...
-type TunersService service
-
-// TunerDevice ...
+// TunerDevice represents a Mirakurun tuner device.
 type TunerDevice struct {
 	Index       int         `json:"index"`
 	Name        string      `json:"name"`
@@ -27,29 +24,45 @@ type TunerDevice struct {
 	IsFault     bool        `json:"isFault"`
 }
 
-// TunerUser ...
+// TunerUser represents a Mirakurun tuner user.
 type TunerUser struct {
 	ID       string `json:"id"`
 	Priority int    `json:"priority"`
 	Agent    string `json:"agent,omitempty"`
 }
 
-// TunerProcess ..
+// TunerProcess represents a Mirakurun tuner process.
 type TunerProcess struct {
 	PID int `json:"pid"`
 }
 
-// Get ...
-func (s *TunersService) Get(ctx context.Context, index int) (*TunerDevice, *http.Response, error) {
+// GetTuners lists the tuners.
+func (c *Client) GetTuners(ctx context.Context) ([]*TunerDevice, *http.Response, error) {
+	req, err := c.NewRequest("GET", "tuners", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	tuners := []*TunerDevice{}
+	resp, err := c.Do(ctx, req, &tuners)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return tuners, resp, nil
+}
+
+// GetTuner fetches a tuner.
+func (c *Client) GetTuner(ctx context.Context, index int) (*TunerDevice, *http.Response, error) {
 	u := fmt.Sprintf("tuners/%d", index)
 
-	req, err := s.client.NewRequest("GET", u, nil)
+	req, err := c.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	tuner := new(TunerDevice)
-	resp, err := s.client.Do(ctx, req, tuner)
+	resp, err := c.Do(ctx, req, tuner)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -57,17 +70,17 @@ func (s *TunersService) Get(ctx context.Context, index int) (*TunerDevice, *http
 	return tuner, resp, nil
 }
 
-// GetProcess
-func (s *TunersService) GetProcess(ctx context.Context, index int) (*TunerProcess, *http.Response, error) {
+// GetTunerProcess fetches a tuner process.
+func (c *Client) GetTunerProcess(ctx context.Context, index int) (*TunerProcess, *http.Response, error) {
 	u := fmt.Sprintf("tuners/%d/process", index)
 
-	req, err := s.client.NewRequest("GET", u, nil)
+	req, err := c.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	process := new(TunerProcess)
-	resp, err := s.client.Do(ctx, req, process)
+	resp, err := c.Do(ctx, req, process)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -75,36 +88,20 @@ func (s *TunersService) GetProcess(ctx context.Context, index int) (*TunerProces
 	return process, resp, nil
 }
 
-// KillProcess
-func (s *TunersService) KillProcess(ctx context.Context, index int) (*TunerProcess, *http.Response, error) {
+// KillTunerProcess kills a tuner process.
+func (c *Client) KillTunerProcess(ctx context.Context, index int) (*TunerProcess, *http.Response, error) {
 	u := fmt.Sprintf("tuners/%d/process", index)
 
-	req, err := s.client.NewRequest("DELETE", u, nil)
+	req, err := c.NewRequest("DELETE", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	process := new(TunerProcess)
-	resp, err := s.client.Do(ctx, req, process)
+	resp, err := c.Do(ctx, req, process)
 	if err != nil {
 		return nil, resp, err
 	}
 
 	return process, resp, nil
-}
-
-// List ...
-func (s *TunersService) List(ctx context.Context) ([]*TunerDevice, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "tuners", nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	tuners := []*TunerDevice{}
-	resp, err := s.client.Do(ctx, req, &tuners)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return tuners, resp, nil
 }

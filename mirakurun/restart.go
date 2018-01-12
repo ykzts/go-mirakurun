@@ -9,23 +9,20 @@ import (
 	"net/http"
 )
 
-// RestartService ...
-type RestartService service
-
-// RestartResponse ...
+// RestartResponse represents a Mirakurun restart response.
 type RestartResponse struct {
 	PID int `json:"_cmd_pid"`
 }
 
-// Do ...
-func (s *RestartService) Do(ctx context.Context) (*RestartResponse, *http.Response, error) {
-	req, err := s.client.NewRequest("PUT", "restart", nil)
+// Restart a Mirakurun process.
+func (c *Client) Restart(ctx context.Context) (*RestartResponse, *http.Response, error) {
+	req, err := c.NewRequest("PUT", "restart", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	restart := new(RestartResponse)
-	resp, err := s.client.Do(ctx, req, restart)
+	resp, err := c.Do(ctx, req, restart)
 	if err != nil {
 		return nil, resp, err
 	}

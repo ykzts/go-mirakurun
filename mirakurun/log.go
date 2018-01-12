@@ -11,18 +11,15 @@ import (
 	"net/http"
 )
 
-// LogService ...
-type LogService service
-
-// Get ...
-func (s *LogService) Get(ctx context.Context) (*bytes.Buffer, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "log", nil)
+// GetLog fetches a log.
+func (c *Client) GetLog(ctx context.Context) (*bytes.Buffer, *http.Response, error) {
+	req, err := c.NewRequest("GET", "log", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	buf := new(bytes.Buffer)
-	resp, err := s.client.Do(ctx, req, buf)
+	resp, err := c.Do(ctx, req, buf)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -30,17 +27,18 @@ func (s *LogService) Get(ctx context.Context) (*bytes.Buffer, *http.Response, er
 	return buf, resp, nil
 }
 
-// GetStream ...
-func (s *LogService) GetStream(ctx context.Context, w io.Writer) (*http.Response, error) {
-	req, err := s.client.NewRequest("GET", "log/stream", nil)
+// GetLogStream fetches a log stream.
+func (c *Client) GetLogStream(ctx context.Context) (io.ReadCloser, *http.Response, error) {
+	req, err := c.NewRequest("GET", "log/stream", nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	resp, err := s.client.Do(ctx, req, w)
+	req = req.WithContext(ctx)
+	resp, err := c.client.Do(req)
 	if err != nil {
-		return resp, err
+		return nil, resp, err
 	}
 
-	return resp, nil
+	return resp.Body, resp, nil
 }

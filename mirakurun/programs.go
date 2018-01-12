@@ -11,10 +11,7 @@ import (
 	"net/http"
 )
 
-// ProgramsService ...
-type ProgramsService service
-
-// Program ...
+// Program represents a Mirakurun program.
 type Program struct {
 	ID        int       `json:"id"`
 	EventID   int       `json:"eventId"`
@@ -37,7 +34,7 @@ type Program struct {
 	RelatedItems []ProgramRelatedItem `json:"relatedItems,omitempty"`
 }
 
-// ProgramGenre ...
+// ProgramGenre represents a Mirakurun program genre.
 type ProgramGenre struct {
 	Level1      int `json:"lv1"`
 	Level2      int `json:"lv2"`
@@ -45,7 +42,7 @@ type ProgramGenre struct {
 	UserNibble2 int `json:"un2"`
 }
 
-// ProgramVideo ...
+// ProgramVideo represents a Mirakurun program video.
 type ProgramVideo struct {
 	Type       string `json:"type"`
 	Resolution string `json:"resolution"`
@@ -54,13 +51,13 @@ type ProgramVideo struct {
 	ComponentType int `json:"componentType"`
 }
 
-// ProgramAudio ...
+// ProgramAudio represents a Mirakurun program audio.
 type ProgramAudio struct {
 	SamplingRate  int `json:"samplingRate"`
 	ComponentType int `json:"componentType"`
 }
 
-// ProgramSeries ...
+// ProgramSeries represents a Mirakurun program series.
 type ProgramSeries struct {
 	ID          int       `json:"id"`
 	Repeat      int       `json:"repeat"`
@@ -71,54 +68,11 @@ type ProgramSeries struct {
 	Name        string    `json:"name"`
 }
 
-// ProgramRelatedItem ...
+// ProgramRelatedItem represents a Mirakurun program related item.
 type ProgramRelatedItem struct {
 	NetworkID int `json:"networkId"`
 	ServiceID int `json:"serviceId"`
 	EventID   int `json:"eventId"`
-}
-
-// Get ...
-func (s *ProgramsService) Get(ctx context.Context, id int) (*Program, *http.Response, error) {
-	u := fmt.Sprintf("programs/%d", id)
-
-	req, err := s.client.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	program := new(Program)
-	resp, err := s.client.Do(ctx, req, program)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return program, resp, nil
-}
-
-// GetStream ...
-func (s *ProgramsService) GetStream(ctx context.Context, id int, decode bool, w io.Writer) (*http.Response, error) {
-	opt := &DecodeOptions{Decode: 0}
-	if decode {
-		opt.Decode = 1
-	}
-
-	u, err := addOptions(fmt.Sprintf("programs/%d/stream", id), opt)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := s.client.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := s.client.Do(ctx, req, w)
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
 }
 
 // ProgramsListOptions ...
@@ -128,23 +82,67 @@ type ProgramsListOptions struct {
 	EventID   int `url:"eventId,omitempty"`
 }
 
-// List ...
-func (s *ProgramsService) List(ctx context.Context, opt *ProgramsListOptions) ([]*Program, *http.Response, error) {
+// GetPrograms lists the programs.
+func (c *Client) GetPrograms(ctx context.Context, opt *ProgramsListOptions) ([]*Program, *http.Response, error) {
 	u, err := addOptions("programs", opt)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
+	req, err := c.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	programs := []*Program{}
-	resp, err := s.client.Do(ctx, req, &programs)
+	resp, err := c.Do(ctx, req, &programs)
 	if err != nil {
 		return nil, resp, err
 	}
 
 	return programs, resp, nil
+}
+
+// GetProgram fetches a program.
+func (c *Client) GetProgram(ctx context.Context, id int) (*Program, *http.Response, error) {
+	u := fmt.Sprintf("programs/%d", id)
+
+	req, err := c.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	program := new(Program)
+	resp, err := c.Do(ctx, req, program)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return program, resp, nil
+}
+
+// GetProgramStream fetches a program stream.
+func (c *Client) GetProgramStream(ctx context.Context, id int, decode bool) (io.ReadCloser, *http.Response, error) {
+	opt := &DecodeOptions{Decode: 0}
+	if decode {
+		opt.Decode = 1
+	}
+
+	u, err := addOptions(fmt.Sprintf("programs/%d/stream", id), opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := c.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req = req.WithContext(ctx)
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return resp.Body, resp, nil
 }

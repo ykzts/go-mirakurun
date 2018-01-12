@@ -20,7 +20,7 @@ import (
 
 const (
 	defaultBaseURL   = "http://127.0.0.1:40772/api/"
-	defaultUserAgent = "go-mirakurun/1"
+	defaultUserAgent = "go-mirakurun/1.0"
 )
 
 // A Client manages communication with the Mirakurun API.
@@ -30,26 +30,9 @@ type Client struct {
 	BaseURL   *url.URL
 	Priority  int
 	UserAgent string
-
-	common service
-
-	Channels *ChannelsService
-	Services *ServicesService
-	Programs *ProgramsService
-	Tuners   *TunersService
-	Events   *EventsService
-	Config   *ConfigService
-	Log      *LogService
-	Version  *VersionService
-	Status   *StatusService
-	Restart  *RestartService
 }
 
-type service struct {
-	client *Client
-}
-
-// DecodeOptions ...
+// DecodeOptions specifies the optional parameters to various Stream method that support decoding.
 type DecodeOptions struct {
 	Decode int `url:"decode,omitempty"`
 }
@@ -76,20 +59,7 @@ func NewClient() *Client {
 
 	baseURL, _ := url.Parse(defaultBaseURL)
 
-	c := &Client{client: httpClient, BaseURL: baseURL}
-	c.common.client = c
-	c.Channels = (*ChannelsService)(&c.common)
-	c.Services = (*ServicesService)(&c.common)
-	c.Programs = (*ProgramsService)(&c.common)
-	c.Tuners = (*TunersService)(&c.common)
-	c.Events = (*EventsService)(&c.common)
-	c.Config = (*ConfigService)(&c.common)
-	c.Log = (*LogService)(&c.common)
-	c.Version = (*VersionService)(&c.common)
-	c.Status = (*StatusService)(&c.common)
-	c.Restart = (*RestartService)(&c.common)
-
-	return c
+	return &Client{client: httpClient, BaseURL: baseURL}
 }
 
 // NewRequest creates an API request.
@@ -145,12 +115,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 	defer resp.Body.Close()
 
 	if v != nil {
-		if w, ok := v.(io.Writer); ok {
-			io.Copy(w, resp.Body)
-		} else {
-			dec := json.NewDecoder(resp.Body)
-			dec.Decode(v)
-		}
+		dec := json.NewDecoder(resp.Body)
+		dec.Decode(v)
 	}
 
 	return resp, nil
