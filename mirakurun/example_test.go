@@ -307,6 +307,99 @@ func ExampleClient_GetEventsStream() {
 	io.Copy(os.Stdout, stream)
 }
 
+func ExampleClient_GetChannelsConfig() {
+	c := mirakurun.NewClient()
+
+	config, _, err := c.GetChannelsConfig(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, cItem := range config {
+		fmt.Printf("%s: %v\n", cItem.Name, cItem.IsDisabled)
+	}
+}
+
+func ExampleClient_UpdateChannelsConfig() {
+	c := mirakurun.NewClient()
+
+	body := mirakurun.ChannelsConfig{
+		&mirakurun.ChannelConfig{Name: "Test Channel", Type: "GR", Channel: "16"},
+	}
+	config, _, err := c.UpdateChannelsConfig(context.Background(), body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, cItem := range config {
+		fmt.Printf("%s: %v\n", cItem.Name, cItem.IsDisabled)
+	}
+}
+
+func ExampleClient_ChannelScan() {
+	c := mirakurun.NewClient()
+
+	stream, _, err := c.ChannelScan(context.Background(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stream.Close()
+
+	io.Copy(os.Stdout, stream)
+}
+
+func ExampleClient_GetServerConfig() {
+	c := mirakurun.NewClient()
+
+	config, _, err := c.GetServerConfig(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(":%d%s\n", config.Port, config.Path)
+}
+
+func ExampleClient_UpdateServerConfig() {
+	c := mirakurun.NewClient()
+
+	body := &mirakurun.ServerConfig{Port: 14772}
+	config, _, err := c.UpdateServerConfig(context.Background(), body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(":%d%s\n", config.Port, config.Path)
+}
+
+func ExampleClient_GetTunersConfig() {
+	c := mirakurun.NewClient()
+
+	config, _, err := c.GetTunersConfig(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, cItem := range config {
+		fmt.Printf("%s: %v\n", cItem.Name, cItem.IsDisabled)
+	}
+}
+
+func ExampleClient_UpdateTunersConfig() {
+	c := mirakurun.NewClient()
+
+	body := mirakurun.TunersConfig{
+		&mirakurun.TunerConfig{Name: "Test Tuner", Types: []string{"BS", "CS"}},
+	}
+	config, _, err := c.UpdateTunersConfig(context.Background(), body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, cItem := range config {
+		fmt.Printf("%s: %v\n", cItem.Name, cItem.IsDisabled)
+	}
+}
+
 func ExampleClient_GetLog() {
 	c := mirakurun.NewClient()
 

@@ -20,7 +20,7 @@ type Channel struct {
 	Services []Service `json:"services,omitempty"`
 }
 
-// ChannelsListOptions specifies the optional parameters to the Client.GetChannels method.
+// ChannelsListOptions specifies the optional parameters to the Client.GetChannels method and Client.GetChannelsByType method.
 type ChannelsListOptions struct {
 	Type    string `url:"type,omitempty"`
 	Channel string `url:"channel,omitempty"`
