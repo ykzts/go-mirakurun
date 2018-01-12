@@ -10,10 +10,7 @@ import (
 	"net/http"
 )
 
-// EventsService ...
-type EventsService service
-
-// Event ...
+// Event represents a Mirakurun event.
 type Event struct {
 	Resource string      `json:"resource"`
 	Type     string      `json:"type"`
@@ -21,15 +18,21 @@ type Event struct {
 	Time     Timestamp   `json:"time"`
 }
 
-// List ...
-func (s *EventsService) List(ctx context.Context) ([]*Event, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "events", nil)
+// EventsListOptions specifies the optional parameters to the Client.GetEventsStream method.
+type EventsListOptions struct {
+	Resource string `url:"resource,omitempty"`
+	Type     string `url:"type,omitempty"`
+}
+
+// GetEvents lists the events.
+func (c *Client) GetEvents(ctx context.Context) ([]*Event, *http.Response, error) {
+	req, err := c.NewRequest("GET", "events", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	events := []*Event{}
-	resp, err := s.client.Do(ctx, req, &events)
+	resp, err := c.Do(ctx, req, &events)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -37,28 +40,23 @@ func (s *EventsService) List(ctx context.Context) ([]*Event, *http.Response, err
 	return events, resp, nil
 }
 
-// EventsListOptions ...
-type EventsListOptions struct {
-	Resource string `url:"resource,omitempty"`
-	Type     string `url:"type,omitempty"`
-}
-
-// ListStream ...
-func (s *EventsService) ListStream(ctx context.Context, opt *EventsListOptions, w io.Writer) (*http.Response, error) {
+// GetEventsStream fetches a events stream.
+func (c *Client) GetEventsStream(ctx context.Context, opt *EventsListOptions) (io.ReadCloser, *http.Response, error) {
 	u, err := addOptions("events/stream", opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
+	req, err := c.NewRequest("GET", u, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	resp, err := s.client.Do(ctx, req, w)
+	req = req.WithContext(ctx)
+	resp, err := c.client.Do(req)
 	if err != nil {
-		return resp, err
+		return nil, resp, err
 	}
 
-	return resp, nil
+	return resp.Body, resp, nil
 }

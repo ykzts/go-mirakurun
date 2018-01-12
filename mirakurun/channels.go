@@ -10,9 +10,6 @@ import (
 	"net/http"
 )
 
-// ChannelsService ...
-type ChannelsService service
-
 // Channel represents a Mirakurun channel.
 type Channel struct {
 	Type     string    `json:"type"`
@@ -23,45 +20,27 @@ type Channel struct {
 	Services []Service `json:"services,omitempty"`
 }
 
-// Get ...
-func (s *ChannelsService) Get(ctx context.Context, typ string, channelID string) (*Channel, *http.Response, error) {
-	u := fmt.Sprintf("channels/%s/%s", typ, channelID)
-
-	req, err := s.client.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	channel := new(Channel)
-	resp, err := s.client.Do(ctx, req, channel)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return channel, resp, nil
-}
-
-// ChannelsListOptions specifies optinal parameters to the ChannelsService.List method.
+// ChannelsListOptions specifies the optional parameters to the Client.GetChannels method.
 type ChannelsListOptions struct {
 	Type    string `url:"type,omitempty"`
 	Channel string `url:"channel,omitempty"`
 	Name    string `url:"name,omitempty"`
 }
 
-// List ...
-func (s *ChannelsService) List(ctx context.Context, opt *ChannelsListOptions) ([]*Channel, *http.Response, error) {
+// GetChannels lists the channels.
+func (c *Client) GetChannels(ctx context.Context, opt *ChannelsListOptions) ([]*Channel, *http.Response, error) {
 	u, err := addOptions("channels", opt)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
+	req, err := c.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	channels := []*Channel{}
-	resp, err := s.client.Do(ctx, req, &channels)
+	resp, err := c.Do(ctx, req, &channels)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -69,23 +48,41 @@ func (s *ChannelsService) List(ctx context.Context, opt *ChannelsListOptions) ([
 	return channels, resp, nil
 }
 
-// ListByType ...
-func (s *ChannelsService) ListByType(ctx context.Context, typ string, opt *ChannelsListOptions) ([]*Channel, *http.Response, error) {
+// GetChannelsByType lists the channels for the specified type.
+func (c *Client) GetChannelsByType(ctx context.Context, typ string, opt *ChannelsListOptions) ([]*Channel, *http.Response, error) {
 	u, err := addOptions(fmt.Sprintf("channels/%s", typ), opt)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequest("GET", u, nil)
+	req, err := c.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	channels := []*Channel{}
-	resp, err := s.client.Do(ctx, req, &channels)
+	resp, err := c.Do(ctx, req, &channels)
 	if err != nil {
 		return nil, resp, err
 	}
 
 	return channels, resp, nil
+}
+
+// GetChannel fetches a channel.
+func (c *Client) GetChannel(ctx context.Context, typ string, channelID string) (*Channel, *http.Response, error) {
+	u := fmt.Sprintf("channels/%s/%s", typ, channelID)
+
+	req, err := c.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	channel := new(Channel)
+	resp, err := c.Do(ctx, req, channel)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return channel, resp, nil
 }

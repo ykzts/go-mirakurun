@@ -10,24 +10,21 @@ import (
 	"net/http"
 )
 
-// VersionService ...
-type VersionService service
-
-// Version ...
+// Version represents a Mirakurun version.
 type Version struct {
 	Current string `json:"current"`
 	Latest  string `json:"latest"`
 }
 
-// Get ...
-func (s *VersionService) Get(ctx context.Context) (*Version, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "version", nil)
+// CheckVersion fetches a Mirakurun version.
+func (c *Client) CheckVersion(ctx context.Context) (*Version, *http.Response, error) {
+	req, err := c.NewRequest("GET", "version", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	version := new(Version)
-	resp, err := s.client.Do(ctx, req, version)
+	resp, err := c.Do(ctx, req, version)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -35,27 +32,28 @@ func (s *VersionService) Get(ctx context.Context) (*Version, *http.Response, err
 	return version, resp, nil
 }
 
-// VersionUpdateOptions ...
+// VersionUpdateOptions specifies the optional parameters to the Client.UpdateVersion method.
 type VersionUpdateOptions struct {
 	Force bool `url:"force,omitempty"`
 }
 
-// Update ...
-func (s *VersionService) Update(ctx context.Context, opt *VersionUpdateOptions, w io.Writer) (*http.Response, error) {
+// UpdateVersion updates a Mirakurun version.
+func (c *Client) UpdateVersion(ctx context.Context, opt *VersionUpdateOptions) (io.ReadCloser, *http.Response, error) {
 	u, err := addOptions("version/update", opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequest("PUT", u, nil)
+	req, err := c.NewRequest("PUT", u, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	resp, err := s.client.Do(ctx, req, w)
+	req = req.WithContext(ctx)
+	resp, err := c.client.Do(req)
 	if err != nil {
-		return resp, err
+		return nil, resp, err
 	}
 
-	return resp, nil
+	return resp.Body, resp, nil
 }

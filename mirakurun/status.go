@@ -9,10 +9,7 @@ import (
 	"net/http"
 )
 
-// StatusService ...
-type StatusService service
-
-// Status ...
+// Status represents a Mirakurun status.
 type Status struct {
 	Version       string              `json:"version"`
 	Process       ProcessStatus       `json:"process"`
@@ -22,7 +19,7 @@ type Status struct {
 	TimerAccuracy TimerAccuracyStatus `json:"timerAccuracy"`
 }
 
-// ProcessStatus ...
+// ProcessStatus represents a Mirakurun process status.
 type ProcessStatus struct {
 	Arch        string            `json:"arch"`
 	Platform    string            `json:"platform"`
@@ -31,13 +28,13 @@ type ProcessStatus struct {
 	MemoryUsage map[string]int    `json:"memoryUsage"`
 }
 
-// EPGStatus ...
+// EPGStatus represents a Mirakurun EPG status.
 type EPGStatus struct {
 	GatheringNetworks []int `json:"gatheringNetworks"`
 	StoredEvents      int   `json:"storedEvents"`
 }
 
-// TimerAccuracyStatus ...
+// TimerAccuracyStatus represents a Mirakurun time accuracy status.
 type TimerAccuracyStatus struct {
 	Last float64            `json:"last"`
 	M1   map[string]float64 `json:"m1"`
@@ -45,15 +42,15 @@ type TimerAccuracyStatus struct {
 	M15  map[string]float64 `json:"m15"`
 }
 
-// Get ...
-func (s *StatusService) Get(ctx context.Context) (*Status, *http.Response, error) {
-	req, err := s.client.NewRequest("GET", "status", nil)
+// GetStatus fetches a status.
+func (c *Client) GetStatus(ctx context.Context) (*Status, *http.Response, error) {
+	req, err := c.NewRequest("GET", "status", nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	status := new(Status)
-	resp, err := s.client.Do(ctx, req, status)
+	resp, err := c.Do(ctx, req, status)
 	if err != nil {
 		return nil, resp, err
 	}

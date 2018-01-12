@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-go-mirakurun is a Mirakurun Client for Go.
+Package mirakurun provides Mirakurun API client.
 
 */
 package mirakurun
