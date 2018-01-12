@@ -18,7 +18,7 @@ defer cancel()
 name := fmt.Sprintf("stream-%d.ts", time.Now().Unix())
 file, err := os.Create(name)
 if err != nil {
-  log.Fatal(err)
+        log.Fatal(err)
 }
 defer file.Close()
 
@@ -26,7 +26,7 @@ c := mirakurun.NewClient()
 
 stream, _, err := c.GetServiceStream(ctx, 3239123608, true)
 if err != nil {
-  log.Fatal(err)
+        log.Fatal(err)
 }
 defer stream.Close()
 
