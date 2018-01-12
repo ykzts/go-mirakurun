@@ -1,6 +1,8 @@
-# go-mirakurun [![build status](https://travis-ci.org/ykzts/go-mirakurun.svg?branch=master)](https://travis-ci.org/ykzts/go-mirakurun)
+# go-mirakurun
 
 go-mirakurun is a [Mirakurun](https://github.com/Chinachu/Mirakurun) Client for Go.
+
+[![build status](https://travis-ci.org/ykzts/go-mirakurun.svg?branch=master)](https://travis-ci.org/ykzts/go-mirakurun) [![GoDoc](https://godoc.org/github.com/ykzts/go-mirakurun/mirakurun?status.svg)](https://godoc.org/github.com/ykzts/go-mirakurun/mirakurun)
 
 ## Usage
 
