@@ -4,7 +4,9 @@
 
 package mirakurun
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNewClient(t *testing.T) {
 	c := NewClient()

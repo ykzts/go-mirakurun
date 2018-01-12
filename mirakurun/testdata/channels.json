@@ -1,0 +1,15 @@
+[
+  {
+    "type": "GR",
+    "channel": "16",
+    "name": "TOKYO MX",
+    "services": [
+      {
+        "id": 3239123609,
+        "serviceId": 23609,
+        "networkId": 32391,
+        "name": "TOKYO MX1"
+      }
+    ]
+  }
+]
