@@ -41,16 +41,16 @@ func TestClient_GetChannels(t *testing.T) {
 	c := NewClient()
 	c.BaseURL, _ = url.Parse(server.URL + "/api/")
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	channels, _, err := c.GetChannels(ctx, nil)
-	if err != err {
-		t.Errorf("Client.GetChannels returned error: %v", err)
+	channels, _, err := c.GetChannels(context.Background(), nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 
+	if len(channels) < 1 {
+		t.Errorf("channels is empty")
+	}
 	if got, want := channels[0].Name, "TOKYO MX"; got != want {
-		t.Errorf("Channel name is %v, want %v", got, want)
+		t.Errorf("channel name is %v, want %v", got, want)
 	}
 }
 
@@ -65,16 +65,15 @@ func TestClient_GetChannelsByType(t *testing.T) {
 	c := NewClient()
 	c.BaseURL, _ = url.Parse(server.URL + "/api/")
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	channels, _, err := c.GetChannelsByType(ctx, "GR", nil)
-	if err != err {
-		t.Errorf("Client.GetChannels returned error: %v", err)
+	channels, _, err := c.GetChannelsByType(context.Background(), "GR", nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	if got, want := channels[0].Name, "TOKYO MX"; got != want {
-		t.Errorf("Channel name is %v, want %v", got, want)
+	if len(channels) < 1 {
+		t.Errorf("channels is empty")
+	} else if got, want := channels[0].Name, "TOKYO MX"; got != want {
+		t.Errorf("channel name is %v, want %v", got, want)
 	}
 }
 
@@ -89,15 +88,12 @@ func TestClient_GetChannel(t *testing.T) {
 	c := NewClient()
 	c.BaseURL, _ = url.Parse(server.URL + "/api/")
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	channel, _, err := c.GetChannel(ctx, "GR", "16")
-	if err != err {
-		t.Errorf("Client.GetChannel returned error: %v", err)
+	channel, _, err := c.GetChannel(context.Background(), "GR", "16")
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	if got, want := channel.Name, "TOKYO MX"; got != want {
-		t.Errorf("Channel name is %v, want %v", got, want)
+		t.Errorf("channel name is %v, want %v", got, want)
 	}
 }
