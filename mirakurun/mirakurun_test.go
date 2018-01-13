@@ -23,6 +23,11 @@
 package mirakurun
 
 import (
+	"context"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"testing"
 )
 
@@ -31,5 +36,81 @@ func TestNewClient(t *testing.T) {
 
 	if got, want := c.BaseURL.String(), defaultBaseURL; got != want {
 		t.Errorf("NewClient BaseURL is %v, want %v", got, want)
+	}
+}
+
+func TestClient_NewRequest(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/channels", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, "[]")
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := NewClient()
+	c.BaseURL, _ = url.Parse(server.URL + "/api/")
+
+	req, err := c.NewRequest("GET", "channels", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got, want := req.URL.String(), server.URL+"/api/channels"; got != want {
+		t.Errorf("request URL is %v, want %v", got, want)
+	}
+}
+
+func TestClient_Do(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/channels", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, "[]")
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := NewClient()
+	c.BaseURL, _ = url.Parse(server.URL + "/api/")
+
+	req, err := c.NewRequest("GET", "channels", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resp, err := c.Do(context.Background(), req, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got, want := resp.StatusCode, 200; got != want {
+		t.Errorf("status code is %v, want %v", got, want)
+	}
+}
+
+func TestClient_Do_notFound(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/not-found", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		http.Error(w, "Cannot GET /api/not-found\n", http.StatusNotFound)
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := NewClient()
+	c.BaseURL, _ = url.Parse(server.URL + "/api/")
+
+	req, err := c.NewRequest("GET", "not-found", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = c.Do(context.Background(), req, nil)
+	if err == nil {
+		t.Fatal("request should returns error")
+	}
+
+	if got, want := err.Error(), "mirakurun: 404 Not Found"; got != want {
+		t.Errorf("error is %v, want %v", got, want)
 	}
 }

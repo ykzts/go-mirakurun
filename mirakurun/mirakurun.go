@@ -127,7 +127,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode < 200 && resp.StatusCode > 202 {
+	if resp.StatusCode < 200 || resp.StatusCode > 202 {
 		return resp, fmt.Errorf("mirakurun: %s", resp.Status)
 	}
 
@@ -151,7 +151,7 @@ func (c *Client) requestStream(ctx context.Context, method string, u string) (io
 		return nil, resp, err
 	}
 
-	if resp.StatusCode < 200 && resp.StatusCode > 202 {
+	if resp.StatusCode < 200 || resp.StatusCode > 202 {
 		resp.Body.Close()
 		return nil, resp, fmt.Errorf("mirakurun: %s", resp.Status)
 	}
