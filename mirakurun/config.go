@@ -70,18 +70,7 @@ func (c *Client) ChannelScan(ctx context.Context, opt *ChannelScanOptions) (io.R
 		return nil, nil, err
 	}
 
-	req, err := c.NewRequest("PUT", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return resp.Body, resp, nil
+	return c.requestStream(ctx, "PUT", u)
 }
 
 // ServerConfig represents a Mirakurun server config.

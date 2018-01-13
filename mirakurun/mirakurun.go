@@ -32,11 +32,6 @@ type Client struct {
 	UserAgent string
 }
 
-// DecodeOptions specifies the optional parameters to various Stream method that support decoding.
-type DecodeOptions struct {
-	Decode int `url:"decode,omitempty"`
-}
-
 func addOptions(s string, opt interface{}) (string, error) {
 	u, err := url.Parse(s)
 	if err != nil {
@@ -65,7 +60,7 @@ func NewClient() *Client {
 // NewRequest creates an API request.
 func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
 	if !strings.HasSuffix(c.BaseURL.Path, "/") {
-		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
+		return nil, fmt.Errorf("mirakurun: BaseURL must have a trailing slash, but %q does not", c.BaseURL)
 	}
 
 	u, err := c.BaseURL.Parse(urlStr)
@@ -114,10 +109,63 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode < 200 && resp.StatusCode > 202 {
+		return resp, fmt.Errorf("mirakurun: %s", resp.Status)
+	}
+
 	if v != nil {
 		dec := json.NewDecoder(resp.Body)
 		dec.Decode(v)
 	}
 
 	return resp, nil
+}
+
+func (c *Client) requestStream(ctx context.Context, method string, u string) (io.ReadCloser, *http.Response, error) {
+	req, err := c.NewRequest(method, u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req = req.WithContext(ctx)
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	if resp.StatusCode < 200 && resp.StatusCode > 202 {
+		resp.Body.Close()
+		return nil, resp, fmt.Errorf("mirakurun: %s", resp.Status)
+	}
+
+	return resp.Body, resp, nil
+}
+
+// DecodeOptions specifies the optional parameters to various Stream method that support decoding.
+type DecodeOptions struct {
+	Decode int `url:"decode,omitempty"`
+}
+
+func (c *Client) getTS(ctx context.Context, u string, decode bool) (io.ReadCloser, *http.Response, error) {
+	opt := &DecodeOptions{Decode: 0}
+	if decode {
+		opt.Decode = 1
+	}
+
+	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	stream, resp, err := c.requestStream(ctx, "GET", u)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	if contentType := resp.Header.Get("Content-Type"); contentType != "video/MP2T" {
+		stream.Close()
+		return nil, resp, fmt.Errorf("mirakurun: invalid content type, but %s does not", contentType)
+	}
+
+	return stream, resp, nil
 }

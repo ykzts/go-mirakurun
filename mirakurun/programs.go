@@ -123,26 +123,7 @@ func (c *Client) GetProgram(ctx context.Context, id int) (*Program, *http.Respon
 
 // GetProgramStream fetches a program stream.
 func (c *Client) GetProgramStream(ctx context.Context, id int, decode bool) (io.ReadCloser, *http.Response, error) {
-	opt := &DecodeOptions{Decode: 0}
-	if decode {
-		opt.Decode = 1
-	}
+	u := fmt.Sprintf("programs/%d/stream", id)
 
-	u, err := addOptions(fmt.Sprintf("programs/%d/stream", id), opt)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := c.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return resp.Body, resp, nil
+	return c.getTS(ctx, u, decode)
 }

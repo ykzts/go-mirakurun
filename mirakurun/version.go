@@ -44,16 +44,5 @@ func (c *Client) UpdateVersion(ctx context.Context, opt *VersionUpdateOptions) (
 		return nil, nil, err
 	}
 
-	req, err := c.NewRequest("PUT", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return resp.Body, resp, nil
+	return c.requestStream(ctx, "PUT", u)
 }

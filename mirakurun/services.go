@@ -71,28 +71,9 @@ func (c *Client) GetServiceByChannel(ctx context.Context, typ string, channel st
 
 // GetServiceStreamByChannel fetches a service stream for the specified channel.
 func (c *Client) GetServiceStreamByChannel(ctx context.Context, typ string, channel string, sid int, decode bool) (io.ReadCloser, *http.Response, error) {
-	opt := &DecodeOptions{Decode: 0}
-	if decode {
-		opt.Decode = 1
-	}
+	u := fmt.Sprintf("channels/%s/%s/services/%d/stream", typ, channel, sid)
 
-	u, err := addOptions(fmt.Sprintf("channels/%s/%s/services/%d/stream", typ, channel, sid), opt)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := c.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return resp.Body, resp, nil
+	return c.getTS(ctx, u, decode)
 }
 
 // GetServices lists the services.
@@ -138,42 +119,12 @@ func (c *Client) GetService(ctx context.Context, id int) (*Service, *http.Respon
 func (c *Client) GetLogoImage(ctx context.Context, id int) (io.ReadCloser, *http.Response, error) {
 	u := fmt.Sprintf("services/%d/logo", id)
 
-	req, err := c.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return resp.Body, resp, nil
+	return c.requestStream(ctx, "GET", u)
 }
 
 // GetServiceStream fetches a service stream.
 func (c *Client) GetServiceStream(ctx context.Context, id int, decode bool) (io.ReadCloser, *http.Response, error) {
-	opt := &DecodeOptions{Decode: 0}
-	if decode {
-		opt.Decode = 1
-	}
+	u := fmt.Sprintf("services/%d/stream", id)
 
-	u, err := addOptions(fmt.Sprintf("services/%d/stream", id), opt)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := c.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return resp.Body, resp, nil
+	return c.getTS(ctx, u, decode)
 }

@@ -47,16 +47,5 @@ func (c *Client) GetEventsStream(ctx context.Context, opt *EventsListOptions) (i
 		return nil, nil, err
 	}
 
-	req, err := c.NewRequest("GET", u, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return resp.Body, resp, nil
+	return c.requestStream(ctx, "GET", u)
 }
