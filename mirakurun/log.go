@@ -29,16 +29,5 @@ func (c *Client) GetLog(ctx context.Context) (*bytes.Buffer, *http.Response, err
 
 // GetLogStream fetches a log stream.
 func (c *Client) GetLogStream(ctx context.Context) (io.ReadCloser, *http.Response, error) {
-	req, err := c.NewRequest("GET", "log/stream", nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return resp.Body, resp, nil
+	return c.requestStream(ctx, "GET", "log/stream")
 }
