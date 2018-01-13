@@ -25,6 +25,7 @@ package mirakurun
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -103,4 +104,78 @@ func (c *Client) GetChannel(ctx context.Context, typ string, channelID string) (
 	}
 
 	return channel, resp, nil
+}
+
+// ChannelsConfig represents a Mirakurun channels config.
+type ChannelsConfig []*ChannelConfig
+
+// ChannelConfig represents a Mirakurun channel config
+type ChannelConfig struct {
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	Channel    string `json:"channel"`
+	Satelite   string `json:"satelite,omitempty"`
+	ServiceID  int    `json:"serviceId,omitempty"`
+	Space      int    `json:"space,omitempty"`
+	IsDisabled bool   `json:"isDisabled,omitempty"`
+}
+
+// GetChannelsConfig fetches a channels config.
+func (c *Client) GetChannelsConfig(ctx context.Context) (ChannelsConfig, *http.Response, error) {
+	req, err := c.NewRequest("GET", "config/channels", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var config ChannelsConfig
+	resp, err := c.Do(ctx, req, config)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return config, resp, nil
+}
+
+// UpdateChannelsConfig updates a channels config.
+func (c *Client) UpdateChannelsConfig(ctx context.Context, body ChannelsConfig) (ChannelsConfig, *http.Response, error) {
+	req, err := c.NewRequest("PUT", "config/channels", body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var config ChannelsConfig
+	resp, err := c.Do(ctx, req, config)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return config, resp, nil
+}
+
+// ChannelScanOptions specifies the optional parameters to the Client.ChannelScan method.
+type ChannelScanOptions struct {
+	Type string `url:"type,omitempty"`
+	Min  int    `url:"min,omitempty"`
+	Max  int    `url:"max,omitempty"`
+}
+
+// ChannelScan scans a channels.
+func (c *Client) ChannelScan(ctx context.Context, opt *ChannelScanOptions) (io.ReadCloser, *http.Response, error) {
+	u, err := addOptions("config/channels/scan", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := c.NewRequest("PUT", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req = req.WithContext(ctx)
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return resp.Body, resp, nil
 }

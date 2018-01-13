@@ -23,6 +23,7 @@
 /*
 Package mirakurun provides Mirakurun API client.
 
-The Mirakurun API specification is at https://github.com/Chinachu/Mirakurun/blob/master/api.yml
+The Mirakurun API specification is at https://github.com/Chinachu/Mirakurun/blob/master/api.yml.
+
 */
 package mirakurun
