@@ -1,0 +1,14 @@
+{
+  "id": 3239123608,
+  "serviceId": 23608,
+  "networkId": 32391,
+  "name": "TOKYO MX1",
+  "type": 1,
+  "logoId": 16,
+  "remoteControlKeyId": 9,
+  "channel": {
+    "type": "GR",
+    "channel": "16"
+  },
+  "hasLogoData": true
+}
