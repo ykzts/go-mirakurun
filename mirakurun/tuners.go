@@ -123,3 +123,48 @@ func (c *Client) KillTunerProcess(ctx context.Context, index int) (*TunerProcess
 
 	return process, resp, nil
 }
+
+// TunersConfig represents a Mirakurun tuners config.
+type TunersConfig []*TunerConfig
+
+// TunerConfig represents a Mirakurun tuner config.
+type TunerConfig struct {
+	Name          string   `json:"name"`
+	Types         []string `json:"types"`
+	Command       string   `json:"command,omitempty"`
+	DVBDevicePath string   `json:"dvbDevicePath,omitempty"`
+	Decoder       string   `json:"decoder,omitempty"`
+	IsDisabled    bool     `json:"isDisabled,omitempty"`
+}
+
+// GetTunersConfig fetches a tuners config.
+func (c *Client) GetTunersConfig(ctx context.Context) (TunersConfig, *http.Response, error) {
+	req, err := c.NewRequest("GET", "config/tuners", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var config TunersConfig
+	resp, err := c.Do(ctx, req, config)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return config, resp, nil
+}
+
+// UpdateTunersConfig updates a tuners config.
+func (c *Client) UpdateTunersConfig(ctx context.Context, body TunersConfig) (TunersConfig, *http.Response, error) {
+	req, err := c.NewRequest("PUT", "config/tuners", body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var config TunersConfig
+	resp, err := c.Do(ctx, req, config)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return config, resp, nil
+}
