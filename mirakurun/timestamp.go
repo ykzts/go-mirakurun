@@ -27,16 +27,14 @@ import (
 	"time"
 )
 
-// Timestamp ...
+// Timestamp represents a Mirakurun timestamp.
 type Timestamp struct {
 	time.Time
 }
 
-// UnmarshalJSON ...
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *Timestamp) UnmarshalJSON(data []byte) error {
-	str := string(data)
-
-	mSec, err := strconv.ParseInt(str, 10, 64)
+	mSec, err := strconv.ParseInt(string(data), 10, 64)
 	if err != nil {
 		return err
 	}
