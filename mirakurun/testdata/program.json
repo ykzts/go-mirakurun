@@ -1,0 +1,43 @@
+{
+  "id": 40010310979,
+  "eventId": 10979,
+  "serviceId": 103,
+  "networkId": 4,
+  "startAt": 1516487400000,
+  "duration": 1500000,
+  "isFree": true,
+  "extended": {
+    "Program Content": "Deleted for copyright.",
+    "Original Author": "CLAMP"
+  },
+  "name": "Cardcaptor Sakura: Clear Card ep. 3",
+  "description": "Deleted for copyright.",
+  "video": {
+    "type": "mpeg2",
+    "resolution": "1080i",
+    "streamContent": 1,
+    "componentType": 179
+  },
+  "audio":{
+    "samplingRate": 48000,
+    "componentType": 3
+  },
+  "genres": [
+    {
+      "lv1": 7,
+      "lv2": 0,
+      "un1": 15,
+      "un2": 15
+    }
+  ],
+  "relatedItems": [
+    {
+      "serviceId": 103,
+      "eventId": 10979
+    },
+    {
+      "serviceId": 104,
+      "eventId": 10979
+    }
+  ]
+}
