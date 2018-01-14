@@ -144,13 +144,13 @@ func (c *Client) GetTunersConfig(ctx context.Context) (TunersConfig, *http.Respo
 		return nil, nil, err
 	}
 
-	var config TunersConfig
-	resp, err := c.Do(ctx, req, config)
+	var tuners TunersConfig
+	resp, err := c.Do(ctx, req, &tuners)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return config, resp, nil
+	return tuners, resp, nil
 }
 
 // UpdateTunersConfig updates a tuners config.
@@ -160,11 +160,11 @@ func (c *Client) UpdateTunersConfig(ctx context.Context, body TunersConfig) (Tun
 		return nil, nil, err
 	}
 
-	var config TunersConfig
-	resp, err := c.Do(ctx, req, config)
+	var tuners TunersConfig
+	resp, err := c.Do(ctx, req, &tuners)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return config, resp, nil
+	return tuners, resp, nil
 }
