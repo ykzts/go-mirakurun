@@ -1,0 +1,5 @@
+{
+  "path": "/var/run/mirakurun.sock",
+  "port": 40772,
+  "logLevel": 2
+}
