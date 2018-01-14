@@ -24,6 +24,7 @@ package mirakurun
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -95,5 +96,92 @@ func TestClient_GetChannel(t *testing.T) {
 
 	if got, want := channel.Name, "TOKYO MX"; got != want {
 		t.Errorf("channel name is %v, want %v", got, want)
+	}
+}
+
+func TestClient_GetChannelsConfig(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/config/channels", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "testdata/channels_config.json")
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := NewClient()
+	c.BaseURL, _ = url.Parse(server.URL + "/api/")
+
+	channels, _, err := c.GetChannelsConfig(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(channels) < 1 {
+		t.Error("channels is empty")
+	} else if got, want := channels[0].Name, "TOKYO MX"; got != want {
+		t.Errorf("channel name is %v, want %v", got, want)
+	}
+}
+
+func TestClient_UpdateChannelsConfig(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/config/channels", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "PUT" {
+			w.Header().Set("Content-Type", "application/json")
+			io.Copy(w, r.Body)
+		} else {
+			w.Header().Set("Content-Type", "text/plain")
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := NewClient()
+	c.BaseURL, _ = url.Parse(server.URL + "/api/")
+
+	body := ChannelsConfig{
+		&ChannelConfig{
+			Name:    "TOKYO MX",
+			Type:    "GR",
+			Channel: "16",
+		},
+	}
+	channels, _, err := c.UpdateChannelsConfig(context.Background(), body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(channels) < 1 {
+		t.Error("channels is empty")
+	} else if got, want := channels[0].Name, "TOKYO MX"; got != want {
+		t.Errorf("channel name is %v, want %v", got, want)
+	}
+}
+
+func TestClient_ChannelScan(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/config/channels/scan", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "PUT" {
+			w.Header().Set("Content-Type", "text/plain; charset=UTF-8")
+			io.WriteString(w, "channel: scanning... (type: \"GR\")\n\n")
+		} else {
+			w.Header().Set("Content-Type", "text/plain")
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	c := NewClient()
+	c.BaseURL, _ = url.Parse(server.URL + "/api/")
+
+	stream, resp, err := c.ChannelScan(context.Background(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stream.Close()
+
+	if got, want := resp.StatusCode, http.StatusOK; got != want {
+		t.Errorf("status code is %v, want %v", got, want)
 	}
 }

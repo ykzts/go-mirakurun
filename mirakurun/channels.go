@@ -127,13 +127,13 @@ func (c *Client) GetChannelsConfig(ctx context.Context) (ChannelsConfig, *http.R
 		return nil, nil, err
 	}
 
-	var config ChannelsConfig
-	resp, err := c.Do(ctx, req, config)
+	var channels ChannelsConfig
+	resp, err := c.Do(ctx, req, &channels)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return config, resp, nil
+	return channels, resp, nil
 }
 
 // UpdateChannelsConfig updates a channels config.
@@ -143,13 +143,13 @@ func (c *Client) UpdateChannelsConfig(ctx context.Context, body ChannelsConfig) 
 		return nil, nil, err
 	}
 
-	var config ChannelsConfig
-	resp, err := c.Do(ctx, req, config)
+	var channels ChannelsConfig
+	resp, err := c.Do(ctx, req, &channels)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return config, resp, nil
+	return channels, resp, nil
 }
 
 // ChannelScanOptions specifies the optional parameters to the Client.ChannelScan method.
