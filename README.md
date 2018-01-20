@@ -43,17 +43,9 @@ for _, channel := range channels {
 ### Recoding
 
 ```go
-name := fmt.Sprintf("stream-%d.ts", time.Now().Unix())
-file, err := os.Create(name)
-if err != nil {
-        log.Fatal(err)
-}
-defer file.Close()
-
 c := mirakurun.NewClient()
 
-ctx := context.Background()
-ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 defer cancel()
 
 stream, _, err := c.GetServiceStream(ctx, 3239123608, true)
@@ -61,6 +53,15 @@ if err != nil {
         log.Fatal(err)
 }
 defer stream.Close()
+
+name := fmt.Sprintf("stream-%d.ts", time.Now().Unix())
+file, err := os.Create(name)
+if err != nil {
+        log.Fatal(err)
+}
+defer file.Close()
+
+fmt.Printf("save to %s\n", name)
 
 io.Copy(file, stream)
 ```
