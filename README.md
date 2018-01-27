@@ -18,7 +18,7 @@ c := mirakurun.NewClient()
 opt := &mirakurun.ChannelScanOptions{Type: "BS"}
 stream, _, err := c.ChannelScan(context.Background(), opt)
 if err != nil {
-        log.Fatal(err)
+	log.Fatal(err)
 }
 defer stream.Close()
 
@@ -32,11 +32,11 @@ c := mirakurun.NewClient()
 
 channels, _, err := c.GetChannels(context.Background(), nil)
 if err != nil {
-        log.Fatal(err)
+	log.Fatal(err)
 }
 
 for _, channel := range channels {
-        fmt.Printf("%s (%s): %s\n", channel.Channel, channel.Type, channel.Name)
+	fmt.Printf("%s (%s): %s\n", channel.Channel, channel.Type, channel.Name)
 }
 ```
 
@@ -50,14 +50,14 @@ defer cancel()
 
 stream, _, err := c.GetServiceStream(ctx, 3239123608, true)
 if err != nil {
-        log.Fatal(err)
+	log.Fatal(err)
 }
 defer stream.Close()
 
 name := fmt.Sprintf("stream-%d.ts", time.Now().Unix())
 file, err := os.Create(name)
 if err != nil {
-        log.Fatal(err)
+	log.Fatal(err)
 }
 defer file.Close()
 
