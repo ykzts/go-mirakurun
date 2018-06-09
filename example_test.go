@@ -32,7 +32,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ykzts/go-mirakurun/mirakurun"
+	"ykzts.com/x/mirakurun"
 )
 
 func ExampleNewClient() {

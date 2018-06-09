@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package mirakurun
+package mirakurun // import "ykzts.com/x/mirakurun"
 
 import (
 	"bytes"
