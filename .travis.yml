@@ -9,5 +9,11 @@ go:
   - 1.8
   - 1.9
 
+install:
+  - export GOPATH=$HOME/go
+  - mkdir -p $GOPATH/src/ykzts.com/x
+  - mv $TRAVIS_BUILD_DIR $GOPATH/src/ykzts.com/x/mirakurun
+  - go get -d -t -v ykzts.com/x/mirakurun/...
+
 script:
-  - go test -v ./...
+  - go test -v ykzts.com/x/mirakurun/...
